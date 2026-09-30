@@ -1,0 +1,289 @@
+%%{init: {"er": {"useMaxWidth": false, "layoutDirection": "LR"}}}%%
+erDiagram
+  %% ===== Identity & access =====
+  Role {
+    INT role_id PK
+    VARCHAR(20) role_name UK
+    VARCHAR(200) description
+  }
+  UserAccount {
+    INT user_id PK
+    INT role_id FK
+    VARCHAR(100) full_name
+    VARCHAR(255) email UK
+    VARCHAR(255) password_hash
+    VARCHAR(20) account_status
+    DATETIME created_at
+    DATETIME last_login_at
+  }
+  EmailVerification {
+    INT verification_id PK
+    INT user_id FK
+    VARCHAR(255) verification_token
+    DATETIME expires_at
+    DATETIME verified_at
+  }
+  PasswordReset {
+    INT reset_id PK
+    INT user_id FK
+    VARCHAR(255) reset_token
+    DATETIME expires_at
+    DATETIME used_at
+  }
+
+  %% ===== Roadmaps & courses =====
+  Roadmap {
+    INT roadmap_id PK
+    VARCHAR(100) title UK
+    VARCHAR(1000) description
+    VARCHAR(20) difficulty_level "NEW Beginner, Intermediate, Advanced"
+    TINYINT(1) is_published
+    DATETIME created_at
+    DATETIME updated_at "NEW"
+  }
+  RoadmapObjective {
+    INT objective_id PK "NEW TABLE"
+    INT roadmap_id FK
+    VARCHAR(255) objective_text
+    INT display_order "UK with roadmap_id"
+  }
+  Topic {
+    INT topic_id PK "NEW TABLE"
+    VARCHAR(50) topic_name UK
+  }
+  RoadmapTopic {
+    INT roadmap_id PK, FK "NEW TABLE"
+    INT topic_id PK, FK
+  }
+  CourseRoadmap {
+    INT course_roadmap_id PK
+    INT roadmap_id FK "UK with course_id"
+    INT course_id FK
+    INT sequence_no
+    TINYINT(1) is_primary "NEW default 0"
+  }
+  Course {
+    INT course_id PK
+    VARCHAR(150) title UK
+    VARCHAR(1000) description
+    VARCHAR(20) difficulty_level "NEW Beginner, Intermediate, Advanced"
+    VARCHAR(500) image_path "NEW nullable"
+    INT estimated_weeks "NEW nullable"
+    TINYINT(1) is_published
+    DATETIME created_at
+    DATETIME updated_at "NEW"
+  }
+  CourseOutcome {
+    INT outcome_id PK "NEW TABLE"
+    INT course_id FK
+    VARCHAR(255) outcome_text
+    INT display_order "UK with course_id"
+  }
+  CourseTutor {
+    INT course_id PK, FK "NEW TABLE"
+    INT tutor_id PK, FK "references UserAccount"
+    DATETIME assigned_at
+  }
+  CourseWeek {
+    INT week_id PK
+    INT course_id FK "UK with week_number"
+    INT week_number
+    VARCHAR(150) title
+    VARCHAR(1000) description
+  }
+  Lesson {
+    INT lesson_id PK
+    INT week_id FK
+    VARCHAR(150) title
+    TEXT content
+    INT lesson_order
+    TINYINT(1) is_required
+    INT estimated_minutes "NEW nullable"
+  }
+  LearningResource {
+    INT resource_id PK
+    INT lesson_id FK
+    VARCHAR(150) title
+    VARCHAR(20) resource_type
+    VARCHAR(500) resource_url
+    VARCHAR(500) file_path
+    VARCHAR(500) description
+  }
+  CodingChallenge {
+    INT challenge_id PK
+    INT lesson_id FK
+    VARCHAR(150) title
+    VARCHAR(1000) description
+    VARCHAR(20) difficulty
+    TEXT starter_code
+    TEXT expected_output "NEW"
+  }
+
+  %% ===== Learning activity =====
+  Enrolment {
+    INT enrolment_id PK
+    INT student_id FK "UK with course_id"
+    INT course_id FK
+    VARCHAR(20) status
+    DATETIME enrolled_at
+    DATETIME completed_at "NEW nullable"
+  }
+  LessonProgress {
+    INT lesson_progress_id PK
+    INT enrolment_id FK "UK with lesson_id"
+    INT lesson_id FK
+    VARCHAR(20) progress_status
+    DATETIME last_accessed_at
+    DATETIME completed_at
+  }
+  CodingChallengeAttempt {
+    INT attempt_id PK "NEW TABLE"
+    INT challenge_id FK
+    INT enrolment_id FK
+    TEXT submitted_code
+    TEXT actual_output "nullable until marked"
+    TINYINT(1) is_correct "nullable until marked"
+    DATETIME attempted_at
+    DATETIME completed_at "nullable"
+  }
+
+  %% ===== Quizzes =====
+  Quiz {
+    INT quiz_id PK
+    INT week_id FK
+    VARCHAR(150) title
+    VARCHAR(1000) instructions
+    DECIMAL pass_mark "NEW (5,2) percent, default 50.00"
+    INT max_attempts "NEW nullable, NULL = unlimited"
+  }
+  QuizQuestion {
+    INT question_id PK
+    INT quiz_id FK
+    VARCHAR(1000) question_text
+    INT marks
+    INT display_order
+    VARCHAR(1000) explanation "NEW nullable"
+  }
+  QuizOption {
+    INT option_id PK
+    INT question_id FK "FIXED UK now (question_id, display_order)"
+    VARCHAR(500) option_text
+    TINYINT(1) is_correct
+    INT display_order
+  }
+  QuizAttempt {
+    INT attempt_id PK
+    INT quiz_id FK
+    INT enrolment_id FK
+    INT attempt_no
+    DATETIME started_at
+    DATETIME submitted_at
+    INT score
+    INT total_marks
+  }
+  QuizAttemptAnswer {
+    INT attempt_answer_id PK
+    INT attempt_id FK
+    INT question_id FK
+    INT selected_option_id FK "nullable = not answered"
+  }
+
+  %% ===== Assignments & review =====
+  Assignment {
+    INT assignment_id PK
+    INT week_id FK, UK
+    VARCHAR(150) title
+    TEXT instructions
+    VARCHAR(20) assignment_type
+    DATETIME due_at "NEW"
+  }
+  Submission {
+    INT submission_id PK
+    INT assignment_id FK
+    INT enrolment_id FK
+    INT submission_no
+    TEXT submission_text
+    DATETIME submitted_at
+    VARCHAR(20) status "NEW default Submitted"
+  }
+  SubmissionFile {
+    INT file_id PK
+    INT submission_id FK
+    VARCHAR(255) file_name
+    VARCHAR(500) file_path
+    INT file_size_bytes "NEW"
+    DATETIME uploaded_at
+  }
+  Feedback {
+    INT feedback_id PK
+    INT submission_id FK
+    INT tutor_id FK
+    VARCHAR(2000) comments
+    VARCHAR(2000) required_improvement "NEW nullable"
+    VARCHAR(20) decision
+    DATETIME reviewed_at
+  }
+
+  %% ===== Discussions =====
+  DiscussionPost {
+    INT post_id PK
+    INT course_id FK "NEW"
+    INT lesson_id FK "now nullable"
+    INT author_id FK
+    VARCHAR(150) title
+    VARCHAR(2000) content
+    TINYINT(1) is_pinned
+    TINYINT(1) is_closed
+    DATETIME created_at
+  }
+  DiscussionReply {
+    INT reply_id PK
+    INT post_id FK
+    INT author_id FK
+    VARCHAR(2000) content
+    DATETIME created_at
+  }
+
+  %% ===== Relationships (existing, preserved) =====
+  Role ||--o{ UserAccount : classifies
+  UserAccount ||--o{ EmailVerification : verifies
+  UserAccount ||--o{ PasswordReset : resets
+  UserAccount ||--o{ Enrolment : "enrols as student"
+  UserAccount ||--o{ Feedback : "reviews as tutor"
+  UserAccount ||--o{ DiscussionPost : writes
+  UserAccount ||--o{ DiscussionReply : writes
+  Roadmap ||--o{ CourseRoadmap : offers
+  Course ||--|{ CourseRoadmap : "is placed in"
+  Course ||--o{ CourseWeek : "is divided into"
+  Course ||--o{ Enrolment : has
+  CourseWeek ||--o{ Lesson : contains
+  CourseWeek ||--o{ Quiz : contains
+  CourseWeek ||--o| Assignment : has
+  Lesson ||--o{ LearningResource : "supported by"
+  Lesson ||--o{ CodingChallenge : includes
+  Lesson ||--o{ LessonProgress : "completed in"
+  Enrolment ||--o{ LessonProgress : records
+  Enrolment ||--o{ QuizAttempt : makes
+  Enrolment ||--o{ Submission : submits
+  Quiz ||--o{ QuizQuestion : contains
+  Quiz ||--o{ QuizAttempt : "attempted as"
+  QuizQuestion ||--o{ QuizOption : offers
+  QuizQuestion ||--o{ QuizAttemptAnswer : "answered in"
+  QuizOption |o--o{ QuizAttemptAnswer : "selected in"
+  QuizAttempt ||--o{ QuizAttemptAnswer : contains
+  Assignment ||--o{ Submission : receives
+  Submission ||--o{ SubmissionFile : contains
+  Submission ||--o{ Feedback : receives
+  DiscussionPost ||--o{ DiscussionReply : receives
+
+  %% ===== Relationships (new or corrected) =====
+  Course ||--o{ CourseTutor : "is taught by"
+  UserAccount ||--o{ CourseTutor : "tutors"
+  Course ||--o{ CourseOutcome : states
+  Roadmap ||--o{ RoadmapObjective : states
+  Roadmap ||--o{ RoadmapTopic : "is tagged with"
+  Topic ||--o{ RoadmapTopic : tags
+  CodingChallenge ||--o{ CodingChallengeAttempt : "attempted as"
+  Enrolment ||--o{ CodingChallengeAttempt : makes
+  Course ||--o{ DiscussionPost : "discussed in"
+  Lesson |o--o{ DiscussionPost : "relates to"

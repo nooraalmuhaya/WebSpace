@@ -1,0 +1,53 @@
+name: Testing
+description: Plan or add tests for a module.
+title: "test: "
+labels: ["testing"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What should be tested and why?
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: Scenarios that must be covered for this task to be complete.
+      value: |
+        - [ ] 
+    validations:
+      required: true
+  - type: input
+    id: owner
+    attributes:
+      label: Responsible Member
+      description: GitHub username of the team member responsible (e.g. @username). Leave as TBD if not yet decided.
+      placeholder: "@username or TBD"
+    validations:
+      required: true
+  - type: dropdown
+    id: module
+    attributes:
+      label: Related Module
+      options:
+        - Authentication & Profile
+        - Student Learning
+        - Quiz & Assessment
+        - Tutor & Submission/Feedback
+        - Admin & Content Management
+        - Database
+        - UI/UX
+        - Testing
+        - Documentation
+        - Integration / Cross-cutting
+    validations:
+      required: true
+  - type: textarea
+    id: testing
+    attributes:
+      label: Testing Requirements
+      description: Type of tests (unit, integration, manual/UAT) and expected test data.
+    validations:
+      required: true

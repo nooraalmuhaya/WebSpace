@@ -1,0 +1,158 @@
+# =============================================================
+# WebSpace .gitignore — ASP.NET Core MVC + MySQL
+# =============================================================
+
+# -------------------------------------------------------------
+# Secrets and local configuration (NEVER commit)
+# -------------------------------------------------------------
+.env
+.env.*
+!.env.example
+appsettings.Development.json
+appsettings.Local.json
+appsettings.*.local.json
+!appsettings.example.json
+secrets.json
+*.secrets.json
+credentials.json
+client_secret*.json
+*.pfx
+*.p12
+*.pem
+*.key
+*.snk
+*.publishsettings
+*.pubxml
+*.pubxml.user
+*.azurePubxml
+
+# -------------------------------------------------------------
+# .NET build output
+# -------------------------------------------------------------
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Ll]og/
+[Ll]ogs/
+artifacts/
+publish/
+out/
+
+# NuGet
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+*.nuget.props
+*.nuget.targets
+project.lock.json
+project.fragment.lock.json
+
+# Compiled binaries
+*.dll
+*.exe
+*.pdb
+*.cache
+*.obj
+*.ilk
+
+# -------------------------------------------------------------
+# Visual Studio
+# -------------------------------------------------------------
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+*.rsuser
+*.VC.db
+*.VC.opendb
+ipch/
+*.aps
+*.ncb
+*.opendb
+*.opensdf
+*.sdf
+*.psess
+*.vsp
+*.vspx
+*.sap
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+launchSettings.local.json
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# VS Code — keep shared recommendations, ignore personal settings
+.vscode/*
+!.vscode/extensions.json
+*.code-workspace
+
+# -------------------------------------------------------------
+# Tests and coverage
+# -------------------------------------------------------------
+[Tt]est[Rr]esult*/
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+coverage/
+coverage*.json
+coverage*.xml
+coverage*.info
+*.lcov
+
+# -------------------------------------------------------------
+# Local databases, dumps and runtime uploads
+# -------------------------------------------------------------
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+*.mdf
+*.ldf
+*.ndf
+*.bak
+database/local/
+database/dumps/
+# Files uploaded by users at runtime (e.g. assignment submissions)
+**/wwwroot/uploads/
+
+# -------------------------------------------------------------
+# Logs and temporary files
+# -------------------------------------------------------------
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+~$*
+
+# -------------------------------------------------------------
+# Front-end tooling (if introduced later)
+# -------------------------------------------------------------
+node_modules/
+**/wwwroot/lib/.cache/
+
+# -------------------------------------------------------------
+# Operating system files
+# -------------------------------------------------------------
+.DS_Store
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/

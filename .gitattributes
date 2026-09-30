@@ -1,0 +1,23 @@
+# Normalise line endings across Windows/macOS/Linux team members
+* text=auto
+
+*.cs      text diff=csharp
+*.cshtml  text
+*.csproj  text
+*.sln     text eol=crlf
+*.slnx    text
+*.json    text
+*.sql     text
+*.md      text
+*.mermaid text
+*.yml     text eol=lf
+*.yaml    text eol=lf
+*.sh      text eol=lf
+
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.pdf  binary
+*.drawio text

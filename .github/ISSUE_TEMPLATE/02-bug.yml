@@ -1,0 +1,67 @@
+name: Bug
+description: Report something that is not working as expected.
+title: "fix: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What went wrong? Include steps to reproduce, expected result and actual result.
+      value: |
+        **Steps to reproduce**
+        1.
+
+        **Expected result**
+
+        **Actual result**
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: Conditions that must be true for this bug to be considered fixed.
+      value: |
+        - [ ]
+    validations:
+      required: true
+  - type: input
+    id: owner
+    attributes:
+      label: Responsible Member
+      description: GitHub username of the team member responsible (e.g. @username). Leave as TBD if not yet decided.
+      placeholder: "@username or TBD"
+    validations:
+      required: true
+  - type: dropdown
+    id: module
+    attributes:
+      label: Related Module
+      options:
+        - Authentication & Profile
+        - Student Learning
+        - Quiz & Assessment
+        - Tutor & Submission/Feedback
+        - Admin & Content Management
+        - Database
+        - UI/UX
+        - Testing
+        - Documentation
+        - Integration / Cross-cutting
+    validations:
+      required: true
+  - type: textarea
+    id: testing
+    attributes:
+      label: Testing Requirements
+      description: The test that reproduces the bug and proves the fix, plus any regression checks.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Browser, OS, branch/commit and any relevant log output. Do not paste passwords, tokens or connection strings.
+    validations:
+      required: false

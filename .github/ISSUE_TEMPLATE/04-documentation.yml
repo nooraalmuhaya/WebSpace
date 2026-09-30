@@ -1,0 +1,53 @@
+name: Documentation
+description: Add or update project documentation.
+title: "docs: "
+labels: ["documentation"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Which document (requirements, design, diagrams, testing, user guide) needs work, and what is missing?
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: What the finished document must contain.
+      value: |
+        - [ ] 
+    validations:
+      required: true
+  - type: input
+    id: owner
+    attributes:
+      label: Responsible Member
+      description: GitHub username of the team member responsible (e.g. @username). Leave as TBD if not yet decided.
+      placeholder: "@username or TBD"
+    validations:
+      required: true
+  - type: dropdown
+    id: module
+    attributes:
+      label: Related Module
+      options:
+        - Authentication & Profile
+        - Student Learning
+        - Quiz & Assessment
+        - Tutor & Submission/Feedback
+        - Admin & Content Management
+        - Database
+        - UI/UX
+        - Testing
+        - Documentation
+        - Integration / Cross-cutting
+    validations:
+      required: true
+  - type: textarea
+    id: testing
+    attributes:
+      label: Testing Requirements
+      description: How the documentation will be checked (e.g. peer review, steps in the user guide reproduced).
+    validations:
+      required: true

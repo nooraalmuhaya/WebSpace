@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: Build and test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # The ASP.NET Core solution has not been created yet. Until a solution
+      # file exists, the workflow reports that and skips the .NET steps.
+      - name: Locate solution file
+        id: solution
+        shell: bash
+        run: |
+          sln=$(find . -maxdepth 2 \( -name '*.sln' -o -name '*.slnx' \) -not -path './.git/*' | head -n 1)
+          if [ -z "$sln" ]; then
+            echo "::notice::No .sln/.slnx file found yet - skipping build and tests."
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Using solution: $sln"
+            echo "found=true" >> "$GITHUB_OUTPUT"
+            echo "path=$sln" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up .NET
+        if: steps.solution.outputs.found == 'true'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        if: steps.solution.outputs.found == 'true'
+        run: dotnet restore "${{ steps.solution.outputs.path }}"
+
+      - name: Build
+        if: steps.solution.outputs.found == 'true'
+        run: dotnet build "${{ steps.solution.outputs.path }}" --configuration Release --no-restore
+
+      - name: Run tests
+        if: steps.solution.outputs.found == 'true'
+        run: dotnet test "${{ steps.solution.outputs.path }}" --configuration Release --no-build --verbosity normal
