@@ -1,6 +1,6 @@
 # Database
 
-WebSpace uses **MySQL**. The data model is defined in [docs/diagrams/webspace_erd_v2.mermaid](../docs/diagrams/webspace_erd_v2.mermaid).
+WebSpace uses **MySQL**. The data model is defined in [docs/diagrams/webspace_erd_organized.mermaid](../docs/diagrams/webspace_erd_organized.mermaid).
 
 | Folder | Contents |
 |--------|----------|

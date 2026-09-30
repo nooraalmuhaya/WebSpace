@@ -1,0 +1,422 @@
+---
+title: WebSpace - Interactive Programming Learning Platform (ERD)
+config:
+  theme: neutral
+  layout: elk
+  elk:
+    mergeEdges: false
+    nodePlacementStrategy: BRANDES_KOEPF
+    considerModelOrder: NODES_AND_EDGES
+  er:
+    layoutDirection: TB
+    diagramPadding: 40
+    entityPadding: 15
+    minEntityWidth: 220
+    fontSize: 14
+---
+erDiagram
+
+    %% LAYOUT NOTE: entities and relationships are declared section by section,
+    %% left-to-right: people/accounts -> membership -> catalogue -> content -> assessment.
+    %% Each relationship is listed in the section of the entity that holds the FK.
+
+    %% ============================================================
+    %% 1. ACCOUNTS, SECURITY & AUDIT
+    %% ============================================================
+    ROLE {
+        int role_id PK
+        varchar name UK "Student, Tutor, Administrator (Guest is not stored)"
+        varchar description "nullable"
+    }
+
+    USER_ACCOUNT {
+        int user_id PK
+        int role_id FK
+        varchar full_name
+        varchar email UK
+        varchar password_hash "never plain text"
+        varchar account_status "PendingVerification | Active | Inactive"
+        datetime email_verified_at "nullable"
+        int failed_login_count "default 0"
+        datetime lockout_end_at "nullable; 5 fails = 15 min pause"
+        varchar security_stamp "rotated on password reset"
+        datetime last_login_at "nullable"
+        datetime created_at
+        datetime updated_at "nullable"
+    }
+
+    EMAIL_VERIFICATION {
+        int verification_id PK
+        int user_id FK
+        varchar target_email "registration or changed email"
+        varchar code_hash "6-digit code, hashed"
+        datetime expires_at "created_at + 15 min"
+        datetime used_at "nullable"
+        datetime created_at
+    }
+
+    PASSWORD_RESET_TOKEN {
+        int reset_token_id PK
+        int user_id FK
+        varchar token_hash UK
+        datetime expires_at "created_at + 30 min"
+        datetime used_at "nullable"
+        datetime created_at
+    }
+
+    ACTIVITY_LOG {
+        int activity_id PK
+        int user_id FK "nullable = System"
+        varchar action "e.g. Created Submission"
+        varchar entity_type "e.g. Course, Lesson"
+        varchar record_label "e.g. SUB-00482"
+        datetime created_at
+    }
+
+    %% ============================================================
+    %% 2. COURSE MEMBERSHIP (users <-> courses)
+    %% ============================================================
+    COURSE_TUTOR {
+        int course_id PK, FK
+        int tutor_user_id PK, FK
+        datetime assigned_at
+    }
+
+    ENROLMENT {
+        int enrolment_id PK
+        int student_user_id FK
+        int course_id FK
+        varchar status "InProgress | Completed"
+        datetime enrolled_at
+        datetime completed_at "nullable"
+        datetime last_accessed_at "nullable"
+    }
+
+    %% ============================================================
+    %% 3. DISCUSSIONS (users <-> courses / weeks)
+    %% ============================================================
+    DISCUSSION_POST {
+        int post_id PK
+        int course_id FK
+        int course_week_id FK "nullable = General"
+        int author_user_id FK
+        varchar title
+        text content
+        bool is_pinned "default false"
+        bool is_closed "default false"
+        datetime created_at
+        datetime updated_at "nullable"
+    }
+
+    DISCUSSION_REPLY {
+        int reply_id PK
+        int post_id FK
+        int author_user_id FK
+        text content
+        datetime created_at
+    }
+
+    %% ============================================================
+    %% 4. COURSE CATALOGUE & ROADMAPS
+    %% ============================================================
+    COURSE {
+        int course_id PK
+        int primary_roadmap_id FK
+        varchar title
+        text description
+        varchar difficulty "Beginner | Intermediate | Advanced"
+        int estimated_weeks "nullable"
+        varchar thumbnail_path "nullable"
+        bool is_published "default false = Draft"
+        datetime created_at
+        datetime updated_at "nullable"
+    }
+
+    COURSE_LEARNING_OUTCOME {
+        int outcome_id PK
+        int course_id FK
+        varchar outcome_text
+        int display_order
+    }
+
+    COURSE_ROADMAP {
+        int roadmap_id PK, FK
+        int course_id PK, FK
+        int sequence_position "unique per roadmap"
+    }
+
+    ROADMAP {
+        int roadmap_id PK
+        varchar title
+        text description
+        varchar difficulty "Beginner | Intermediate | Advanced"
+        bool is_published "default false"
+        datetime created_at
+        datetime updated_at "nullable"
+    }
+
+    ROADMAP_OBJECTIVE {
+        int objective_id PK
+        int roadmap_id FK
+        varchar objective_text
+        int display_order
+    }
+
+    ROADMAP_TOPIC {
+        int roadmap_id PK, FK
+        int topic_id PK, FK
+    }
+
+    TOPIC {
+        int topic_id PK
+        varchar name UK "HTML, CSS, SQL ..."
+    }
+
+    %% ============================================================
+    %% 5. LEARNING CONTENT
+    %% ============================================================
+    COURSE_WEEK {
+        int course_week_id PK
+        int course_id FK
+        int week_number "unique per course"
+        varchar title
+        text description "nullable"
+    }
+
+    LESSON {
+        int lesson_id PK
+        int course_week_id FK
+        varchar title
+        text content
+        int lesson_order "unique per week"
+        bool is_required "default true"
+        int estimated_read_minutes "nullable"
+        datetime created_at
+        datetime updated_at "nullable"
+    }
+
+    LEARNING_RESOURCE {
+        int resource_id PK
+        int lesson_id FK
+        varchar title
+        varchar resource_type "Video | Link | File"
+        varchar resource_url "nullable; Video/Link"
+        varchar file_path "nullable; File"
+        bigint file_size_bytes "nullable"
+        varchar description "nullable"
+    }
+
+    CODING_CHALLENGE {
+        int challenge_id PK
+        int lesson_id FK
+        varchar title
+        text description
+        varchar difficulty "Beginner | Intermediate | Advanced"
+        text starter_code "nullable"
+        text expected_output "nullable - needs confirmation"
+    }
+
+    %% ============================================================
+    %% 6. LEARNING PROGRESS
+    %% ============================================================
+    LESSON_PROGRESS {
+        int lesson_progress_id PK
+        int student_user_id FK
+        int lesson_id FK
+        varchar status "InProgress | Completed"
+        datetime started_at
+        datetime completed_at "nullable"
+    }
+
+    CHALLENGE_PROGRESS {
+        int challenge_progress_id PK
+        int student_user_id FK
+        int challenge_id FK
+        text saved_code "auto-saved"
+        bool is_completed "default false"
+        datetime last_saved_at
+        datetime completed_at "nullable"
+    }
+
+    %% ============================================================
+    %% 7. ASSESSMENT - QUIZZES & ATTEMPTS
+    %% ============================================================
+    QUIZ {
+        int quiz_id PK
+        int course_week_id FK "UK - one quiz per week"
+        varchar title
+        text instructions "nullable"
+        int pass_mark_percent "default 50"
+        int max_attempts "nullable = unlimited"
+    }
+
+    QUIZ_QUESTION {
+        int question_id PK
+        int quiz_id FK
+        text question_text
+        text code_snippet "nullable"
+        int marks
+        int display_order "unique per quiz"
+        text explanation "nullable"
+    }
+
+    QUIZ_OPTION {
+        int option_id PK
+        int question_id FK
+        varchar option_text
+        bool is_correct "exactly one true per question"
+        int display_order "A, B, C, D"
+    }
+
+    QUIZ_ATTEMPT {
+        int attempt_id PK
+        int student_user_id FK
+        int quiz_id FK
+        int attempt_number "unique per student + quiz"
+        varchar status "InProgress | Submitted"
+        datetime started_at
+        datetime submitted_at "nullable"
+        int score "nullable until submitted"
+        int max_score "snapshot of total marks"
+    }
+
+    QUIZ_ATTEMPT_ANSWER {
+        int answer_id PK
+        int attempt_id FK
+        int question_id FK
+        int selected_option_id FK "nullable = not answered"
+        bool is_correct "set on submit"
+        int marks_awarded "set on submit"
+    }
+
+    %% ============================================================
+    %% 8. ASSESSMENT - ASSIGNMENTS, SUBMISSIONS & FEEDBACK
+    %% ============================================================
+    ASSIGNMENT {
+        int assignment_id PK
+        int course_week_id FK "UK - one assignment per week"
+        varchar title
+        text instructions
+        varchar assignment_type "FileUpload | FileUploadAndText | CodeUpload"
+        datetime due_at "nullable - missing from admin form"
+        varchar accepted_file_types "nullable, e.g. .html,.css,.zip,.pdf"
+        datetime created_at
+        datetime updated_at "nullable"
+    }
+
+    ASSIGNMENT_REQUIREMENT {
+        int requirement_id PK
+        int assignment_id FK
+        varchar requirement_text
+        int display_order
+    }
+
+    SUBMISSION {
+        int submission_id PK "shown as SUB-00482"
+        int assignment_id FK
+        int student_user_id FK
+        int attempt_number "1, 2, ... on resubmission"
+        text submission_text "nullable; reflection"
+        varchar status "Submitted | UnderReview | NeedsImprovement | Approved"
+        datetime submitted_at
+    }
+
+    SUBMISSION_FILE {
+        int submission_file_id PK
+        int submission_id FK
+        varchar original_file_name
+        varchar stored_file_path
+        bigint file_size_bytes
+        datetime uploaded_at
+    }
+
+    FEEDBACK {
+        int feedback_id PK "shown as FB-00219"
+        int submission_id FK "UK - one review per submission"
+        int tutor_user_id FK "nullable after tutor deleted"
+        text feedback_text "min 20 characters"
+        varchar decision "Approved | NeedsImprovement"
+        text required_improvement "required if NeedsImprovement"
+        varchar status "Draft | Submitted"
+        datetime created_at
+        datetime submitted_at "nullable while Draft"
+    }
+
+    %% ============================================================
+    %% RELATIONSHIPS (grouped to match the sections above)
+    %% ============================================================
+
+    %% --- 1. ACCOUNTS, SECURITY & AUDIT ---
+    ROLE ||--o{ USER_ACCOUNT : "assigned to"
+    USER_ACCOUNT ||--o{ EMAIL_VERIFICATION : "verifies with"
+    USER_ACCOUNT ||--o{ PASSWORD_RESET_TOKEN : "resets with"
+    USER_ACCOUNT |o--o{ ACTIVITY_LOG : "performs"
+
+    %% --- 2. COURSE MEMBERSHIP (users <-> courses) ---
+    USER_ACCOUNT ||--o{ COURSE_TUTOR : "tutors"
+    COURSE ||--o{ COURSE_TUTOR : "taught by"
+    USER_ACCOUNT ||--o{ ENROLMENT : "enrols"
+    COURSE ||--o{ ENROLMENT : "has"
+
+    %% --- 3. DISCUSSIONS (users <-> courses / weeks) ---
+    USER_ACCOUNT ||--o{ DISCUSSION_POST : "authors"
+    COURSE ||--o{ DISCUSSION_POST : "hosts"
+    COURSE_WEEK |o--o{ DISCUSSION_POST : "relates to"
+    DISCUSSION_POST ||--o{ DISCUSSION_REPLY : "has"
+    USER_ACCOUNT ||--o{ DISCUSSION_REPLY : "writes"
+
+    %% --- 4. COURSE CATALOGUE & ROADMAPS ---
+    ROADMAP ||--o{ COURSE : "is primary roadmap of"
+    COURSE ||--o{ COURSE_LEARNING_OUTCOME : "lists"
+    COURSE ||--o{ COURSE_ROADMAP : "appears in"
+    ROADMAP ||--o{ COURSE_ROADMAP : "sequences"
+    ROADMAP ||--o{ ROADMAP_OBJECTIVE : "lists"
+    ROADMAP ||--o{ ROADMAP_TOPIC : "tagged with"
+    TOPIC ||--o{ ROADMAP_TOPIC : "tags"
+
+    %% --- 5. LEARNING CONTENT ---
+    COURSE ||--o{ COURSE_WEEK : "divided into"
+    COURSE_WEEK ||--o{ LESSON : "contains"
+    LESSON ||--o{ LEARNING_RESOURCE : "has"
+    LESSON ||--o{ CODING_CHALLENGE : "has"
+
+    %% --- 6. LEARNING PROGRESS ---
+    LESSON ||--o{ LESSON_PROGRESS : "tracked by"
+    USER_ACCOUNT ||--o{ LESSON_PROGRESS : "tracks"
+    CODING_CHALLENGE ||--o{ CHALLENGE_PROGRESS : "attempted in"
+    USER_ACCOUNT ||--o{ CHALLENGE_PROGRESS : "works on"
+
+    %% --- 7. ASSESSMENT - QUIZZES & ATTEMPTS ---
+    COURSE_WEEK ||--o| QUIZ : "has"
+    QUIZ ||--o{ QUIZ_QUESTION : "contains"
+    QUIZ_QUESTION ||--o{ QUIZ_OPTION : "offers"
+    QUIZ ||--o{ QUIZ_ATTEMPT : "attempted in"
+    USER_ACCOUNT ||--o{ QUIZ_ATTEMPT : "makes"
+    QUIZ_ATTEMPT ||--o{ QUIZ_ATTEMPT_ANSWER : "records"
+    QUIZ_QUESTION ||--o{ QUIZ_ATTEMPT_ANSWER : "answered in"
+    QUIZ_OPTION |o--o{ QUIZ_ATTEMPT_ANSWER : "selected in"
+
+    %% --- 8. ASSESSMENT - ASSIGNMENTS, SUBMISSIONS & FEEDBACK ---
+    COURSE_WEEK ||--o| ASSIGNMENT : "has"
+    ASSIGNMENT ||--o{ ASSIGNMENT_REQUIREMENT : "lists"
+    ASSIGNMENT ||--o{ SUBMISSION : "receives"
+    USER_ACCOUNT ||--o{ SUBMISSION : "submits"
+    SUBMISSION ||--o{ SUBMISSION_FILE : "includes"
+    SUBMISSION ||--o| FEEDBACK : "reviewed by"
+    USER_ACCOUNT |o--o{ FEEDBACK : "writes"
+
+    %% ============================================================
+    %% OPTIONAL SECTION COLOURS (Mermaid v11+ only).
+    %% Uncomment the lines below if your renderer supports ER styling;
+    %% leave them commented for draw.io / older Mermaid versions.
+    %% ============================================================
+    %% classDef auth    fill:#E8F0FE,stroke:#3B5B92
+    %% classDef member  fill:#F3E8FD,stroke:#6A3D9A
+    %% classDef catalog fill:#E6F4EA,stroke:#2E7D32
+    %% classDef content fill:#FFF8E1,stroke:#B7791F
+    %% classDef assess  fill:#FDECEA,stroke:#B23B3B
+    %% class ROLE,USER_ACCOUNT,EMAIL_VERIFICATION,PASSWORD_RESET_TOKEN,ACTIVITY_LOG auth
+    %% class COURSE_TUTOR,ENROLMENT,DISCUSSION_POST,DISCUSSION_REPLY member
+    %% class COURSE,COURSE_LEARNING_OUTCOME,COURSE_ROADMAP,ROADMAP,ROADMAP_OBJECTIVE,ROADMAP_TOPIC,TOPIC catalog
+    %% class COURSE_WEEK,LESSON,LEARNING_RESOURCE,CODING_CHALLENGE,LESSON_PROGRESS,CHALLENGE_PROGRESS content
+    %% class QUIZ,QUIZ_QUESTION,QUIZ_OPTION,QUIZ_ATTEMPT,QUIZ_ATTEMPT_ANSWER,ASSIGNMENT,ASSIGNMENT_REQUIREMENT,SUBMISSION,SUBMISSION_FILE,FEEDBACK assess

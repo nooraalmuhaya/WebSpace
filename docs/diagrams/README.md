@@ -4,7 +4,7 @@ Editable diagram sources. Prefer Mermaid (`.mermaid`) or draw.io (`.drawio`); ad
 
 | Diagram | File | Status |
 |---------|------|--------|
-| Entity Relationship Diagram | [webspace_erd_v2.mermaid](webspace_erd_v2.mermaid) | Available |
+| Entity Relationship Diagram | [webspace_erd_organized.mermaid](webspace_erd_organized.mermaid) | Available |
 | Use Case Diagram | — | Planned |
 | Activity Diagrams | — | Planned |
 | System Workflow | — | Planned |

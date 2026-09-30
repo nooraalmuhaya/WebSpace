@@ -48,7 +48,7 @@ Responsible members are `TBD` until each member's GitHub username is confirmed.
 - [ ] An enrolled student can view course weeks, lessons and learning resources in order.
 - [ ] Lesson progress is recorded and shown on a student dashboard.
 - [ ] A student can attempt coding challenges, and attempts are stored.
-- [ ] A student can create discussion posts and replies for a course or lesson.
+- [ ] A student can create discussion posts and replies for a course, optionally linked to one of the course's weeks.
 
 **Responsible Member:** TBD
 
@@ -106,7 +106,7 @@ Responsible members are `TBD` until each member's GitHub username is confirmed.
 
 ## 6. Database schema and seed data
 
-**Description:** Implement the MySQL schema from `docs/diagrams/webspace_erd_v2.mermaid` and provide seed data for development and demonstration.
+**Description:** Implement the MySQL schema from `docs/diagrams/webspace_erd_organized.mermaid` and provide seed data for development and demonstration.
 
 **Acceptance Criteria**
 - [ ] All ERD tables, keys, unique constraints and relationships exist.

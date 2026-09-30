@@ -111,7 +111,7 @@ Configuration will follow `src/WebSpace/appsettings.example.json`. Copy it to `a
 
 ## Database Setup
 
-The database schema is defined in the [ERD](docs/diagrams/webspace_erd_v2.mermaid). Once the database is implemented, initialisation steps (creating the schema and loading seed data into a local MySQL instance) will be documented in [database/README.md](database/README.md).
+The database schema is defined in the [ERD](docs/diagrams/webspace_erd_organized.mermaid). Once the database is implemented, initialisation steps (creating the schema and loading seed data into a local MySQL instance) will be documented in [database/README.md](database/README.md).
 
 ## Contribution Guidelines
 
